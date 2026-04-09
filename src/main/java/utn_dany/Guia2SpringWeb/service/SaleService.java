@@ -30,7 +30,7 @@ public class SaleService {
         ProductEntity product = productRepository.findById(productId)
                 .orElseThrow( ()->new NullProductException("product doen´t exist"));
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new NewUserException("user doesn´t exist"));
+                .orElseThrow(() -> new NullUserException("user doesn´t exist"));
 
         if(quantity<0){
             throw new IllegalQuantityException("No negative");
@@ -44,6 +44,8 @@ public class SaleService {
             sale.setUserId(userId);
             sale.setTotalPrice(product.getPrice()*quantity);
 
+            product.setStock(product.getStock()-quantity);
+            productRepository.update(product);
         return sale;
     }
 
@@ -61,6 +63,12 @@ public class SaleService {
         }
         saleToUpdate.setQuantity(newQuantity);
         return saleRepository.update(saleToUpdate);
+    }
+
+    public void deleteSale (Long id) {
+
+        SaleEntity saleToDelete = saleRepository.findById(id)
+                .orElseThrow(() -> new NullSaleException("sale doesn't exist"));
     }
 
 }
